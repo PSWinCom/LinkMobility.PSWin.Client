@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client", "Example.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinkMobility.PSWin.Receiver", "PSWin.Receiver\LinkMobility.PSWin.Receiver.csproj", "{3F783F0E-D2E1-4442-BBB1-80C67B3E0846}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Receiver", "Example.Receiver\Example.Receiver.csproj", "{38C3F27E-2C39-4F82-9FA5-8038C359A89E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3F783F0E-D2E1-4442-BBB1-80C67B3E0846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F783F0E-D2E1-4442-BBB1-80C67B3E0846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F783F0E-D2E1-4442-BBB1-80C67B3E0846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38C3F27E-2C39-4F82-9FA5-8038C359A89E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38C3F27E-2C39-4F82-9FA5-8038C359A89E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38C3F27E-2C39-4F82-9FA5-8038C359A89E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38C3F27E-2C39-4F82-9FA5-8038C359A89E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -81,6 +81,9 @@ namespace LinkMobility.PSWin.Receiver.Parsers
 
         private static Metadata ParseMetadata(XElement element)
         {
+            if (element == null)
+                return null;
+
             var dictionary = new Dictionary<string, string>();
             var dataElements = element.Elements("DATA");
             foreach (var dataElement in dataElements)
