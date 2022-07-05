@@ -1,0 +1,150 @@
+﻿using LinkMobility.PSWin.Client.Extensions;
+using LinkMobility.PSWin.Client.Interfaces;
+using LinkMobility.PSWin.Client.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace LinkMobility.PSWin.Client.Transports
+{
+    internal class XmlTransport : ITransport
+    {
+        public static readonly Uri DefaultEndpoint = new Uri("https://xml.pswin.com");
+        public const uint BatchSize = 100;
+
+        private readonly Uri endpoint;
+        private string username;
+        private string password;
+        private Lazy<HttpClient> client = new Lazy<HttpClient>(() => new HttpClient());
+
+        public XmlTransport(string username, string password, Uri endpoint)
+        {
+            this.username = username;
+            this.password = password;
+            this.endpoint = endpoint;
+        }
+
+        public XmlTransport(string username, string password) : this(username, password, DefaultEndpoint)
+        {
+        }
+
+        public async Task<IEnumerable<MessageResult>> SendAsync(IEnumerable<Sms> messages, string sessionData = null)
+        {
+            var messageBatches = messages
+                .Batch(BatchSize)
+                .Select(b => b.ToArray());
+            var results = new List<MessageResult>();
+            foreach (var messageBatch in messageBatches)
+            {
+                var batchResults = await SendBatchAsync(messageBatch, sessionData);
+                results.AddRange(batchResults);
+            }
+            return results;
+        }
+
+        private async Task<IEnumerable<MessageResult>> SendBatchAsync(Sms[] messageBatch, string sessionData)
+        {
+            var payload = BuildBatchPayload(sessionData, messageBatch);
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = endpoint,
+                Content = new StringContent(payload.Declaration.ToString() + payload.ToString(), Encoding.UTF8, "text/xml"),
+            };
+
+            var response = await client.Value.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                throw new SendMessageException($"Sending failed because Gateway endpoint returned {(int)response.StatusCode} {response.ReasonPhrase}");
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return GetSendResult(XDocument.Parse(responseContent), messageBatch);
+        }
+
+        private XDocument BuildBatchPayload(string sessionData, IEnumerable<Sms> messages)
+        {
+            var session = new XElement("SESSION");
+            session.Add(new XElement("CLIENT", username));
+            session.Add(new XElement("PW", password));
+            if (!string.IsNullOrEmpty(sessionData))
+                session.Add(new XElement("SD", sessionData));
+            session.Add(BuildMessageList(messages));
+            
+            return new XDocument(
+                    declaration: new XDeclaration("1.0", "iso-8859-1", null),
+                    content: session);
+        }
+
+        private XElement BuildMessageList(IEnumerable<Sms> messages)
+        {
+            return new XElement("MSGLST", messages.Select(BuildMessage));
+        }
+
+        private XElement BuildMessage(Sms msg, int batchIndex)
+        {
+            var result = new XElement("MSG");
+
+            result.Add(new XElement("ID", batchIndex + 1));
+            result.Add(new XElement("TEXT", msg.Text));
+            result.Add(new XElement("SND", msg.SenderNumber));
+            result.Add(new XElement("RCV", msg.ReceiverNumber));
+
+            if (!string.IsNullOrEmpty(msg.ShortCode))
+                result.Add(new XElement("SHORTCODE", msg.ShortCode));
+            if (msg.Tariff > 0)
+                result.Add(new XElement("TARIFF", msg.Tariff));
+            if (msg.RequestReceipt)
+                result.Add(new XElement("RCPREQ", "Y"));
+            if (!string.IsNullOrEmpty(msg.CpaTag))
+                result.Add(new XElement("CPATAG", msg.CpaTag));
+            if (msg.Type.HasValue)
+                result.Add(new XElement("OP", msg.Type.Value.ToString("D")));
+            if (msg.TimeToLive.HasValue)
+                result.Add(new XElement("TTL", msg.TimeToLive.Value.TotalMinutes.ToString("0")));
+            if (msg.DeliveryTime.HasValue)
+                result.Add(new XElement("DELIVERYTIME", msg.DeliveryTime.Value.ToString("yyyyMMddHHmm")));
+            if (msg.Network != null)
+                result.Add(new XElement("NET", msg.Network.ToString()));
+            if (msg.AgeLimit.HasValue)
+                result.Add(new XElement("AGELIMIT", msg.AgeLimit.Value.ToString("0")));
+            if (!string.IsNullOrEmpty(msg.ServiceCode))
+                result.Add(new XElement("SERVICECODE", msg.ServiceCode));
+            if (msg.Replace.HasValue)
+                result.Add(new XElement("REPLACE", msg.Replace.Value.ToString("D")));
+            if (msg.IsFlashMessage)
+                result.Add(new XElement("CLASS", "0"));
+
+            return result;
+        }
+
+        // Items returned in same order?
+        // MSGLST populated if batch fails?
+        private static IEnumerable<MessageResult> GetSendResult(XDocument response, Sms[] messages)
+        {
+            var logon = response.Descendants("LOGON").FirstOrDefault()?.Value;
+            var reason = response.Descendants("REASON").FirstOrDefault()?.Value;
+            if (logon == "OK")
+            {
+                return response
+                    .Descendants("MSG")
+                    .Select((el) =>
+                    {
+                        var id = int.Parse(el.Element("ID").Value);
+                        return new MessageResult(
+                            el.Element("REF")?.Value,
+                            el.Element("STATUS")?.Value == "OK",
+                            el.Element("INFO")?.Value,
+                            messages[id - 1]
+                        );
+                    });
+            }
+            else
+            {
+                return messages.Select(m => new MessageResult(null, false, reason, m));
+            }
+        }
+    }
+}
