@@ -90,35 +90,6 @@ namespace LinkMobility.GatewayReceiver
             }
         }
 
-        private HttpResponseMessage Success()
-        {
-            return new HttpResponseMessage
-            {
-                StatusCode = System.Net.HttpStatusCode.OK,
-                ReasonPhrase = "OK",
-            };
-        }
-
-        private HttpResponseMessage BadReqeust(string message)
-        {
-            return new HttpResponseMessage
-            {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
-                ReasonPhrase = "Bad Request",
-                Content = new StringContent(message),
-            };
-        }
-
-        private HttpResponseMessage ServerError(string message)
-        {
-            return new HttpResponseMessage
-            {
-                StatusCode = System.Net.HttpStatusCode.InternalServerError,
-                ReasonPhrase = "Internal Server Error",
-                Content = new StringContent(message),
-            };
-        }
-
         private async Task<(XDocument document, HttpStatusCode code, string message)> GetDocumentFromBody(string content)
         {
             if (string.IsNullOrWhiteSpace(content))

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace LinkMobility.PSWin.Receiver.Model
 {
@@ -9,7 +11,16 @@ namespace LinkMobility.PSWin.Receiver.Model
             Data = data;
         }
 
-        public string TimeStamp => Get("TIMESTAMP");
+        public DateTime TimeStamp
+        {
+            get
+            {
+                var timestamp = Get("TIMESTAMP");
+                if (timestamp == null)
+                    return default;
+                return DateTime.ParseExact(timestamp, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+        }
 
         public string Reference => Get("REFERENCE");
 

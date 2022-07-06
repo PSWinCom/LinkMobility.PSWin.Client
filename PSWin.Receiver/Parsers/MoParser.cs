@@ -2,6 +2,7 @@
 using LinkMobility.PSWin.Receiver.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -88,7 +89,7 @@ namespace LinkMobility.PSWin.Receiver.Parsers
             var dataElements = element.Elements("DATA");
             foreach (var dataElement in dataElements)
             {
-                var key = dataElement.Attribute("Key")?.Value;
+                var key = dataElement.Attribute("KEY")?.Value;
                 if (key != null)
                     dictionary.Add(key, dataElement.Attribute("VALUE")?.Value);
             }
@@ -110,7 +111,7 @@ namespace LinkMobility.PSWin.Receiver.Parsers
 
             try
             {
-                return (T)Convert.ChangeType(child.Value, typeof(T));
+                return (T)Convert.ChangeType(child.Value, typeof(T), CultureInfo.InvariantCulture);
             }
             catch (Exception ex) when (ex is InvalidCastException || ex is FormatException || ex is OverflowException)
             {
