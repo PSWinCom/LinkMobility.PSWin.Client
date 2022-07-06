@@ -85,21 +85,30 @@ namespace LinkMobility.PSWin.Client.Transports
 
         private XElement BuildMessage(Sms msg, int batchIndex)
         {
-            var result = new XElement("MSG");
+            var text = msg.Text;
+            if (msg.Type == MessageType.Unicode)
+                text = Ucs2HexEncode(text);
 
+            var result = new XElement("MSG");
             result.Add(new XElement("ID", batchIndex + 1));
-            result.Add(new XElement("TEXT", msg.Text));
+            result.Add(new XElement("TEXT", text));
             result.Add(new XElement("SND", msg.SenderNumber));
             result.Add(new XElement("RCV", msg.ReceiverNumber));
 
-            if (!string.IsNullOrEmpty(msg.ShortCode))
-                result.Add(new XElement("SHORTCODE", msg.ShortCode));
-            if (msg.Tariff > 0)
-                result.Add(new XElement("TARIFF", msg.Tariff));
+            if (msg.CpaGas != null)
+            {
+                result.Add(new XElement("TARIFF", msg.CpaGas.Tariff));
+                if (!string.IsNullOrEmpty(msg.CpaGas.Tag))
+                    result.Add(new XElement("CPATAG", msg.CpaGas.Tag));
+                if (msg.CpaGas.AgeRestriction.HasValue)
+                    result.Add(new XElement("AGELIMIT", msg.CpaGas.AgeRestriction.Value.ToString("0")));
+                if (!string.IsNullOrEmpty(msg.CpaGas.ServiceCode))
+                    result.Add(new XElement("SERVICECODE", msg.CpaGas.ServiceCode));
+            }
+            
             if (msg.RequestReceipt)
                 result.Add(new XElement("RCPREQ", "Y"));
-            if (!string.IsNullOrEmpty(msg.CpaTag))
-                result.Add(new XElement("CPATAG", msg.CpaTag));
+            
             if (msg.Type.HasValue)
                 result.Add(new XElement("OP", msg.Type.Value.ToString("D")));
             if (msg.TimeToLive.HasValue)
@@ -108,16 +117,22 @@ namespace LinkMobility.PSWin.Client.Transports
                 result.Add(new XElement("DELIVERYTIME", msg.DeliveryTime.Value.ToString("yyyyMMddHHmm")));
             if (msg.Network != null)
                 result.Add(new XElement("NET", msg.Network.ToString()));
-            if (msg.AgeLimit.HasValue)
-                result.Add(new XElement("AGELIMIT", msg.AgeLimit.Value.ToString("0")));
-            if (!string.IsNullOrEmpty(msg.ServiceCode))
-                result.Add(new XElement("SERVICECODE", msg.ServiceCode));
             if (msg.Replace.HasValue)
                 result.Add(new XElement("REPLACE", msg.Replace.Value.ToString("D")));
             if (msg.IsFlashMessage)
                 result.Add(new XElement("CLASS", "0"));
 
             return result;
+        }
+
+        private static string Ucs2HexEncode(string text)
+        {
+            // BigEndianUnicode a.k.a. UTF-16BE is a superset of UCS2.
+            var ucs2Bytes = Encoding.BigEndianUnicode.GetBytes(text);
+            var hexBuilder = new StringBuilder();
+            foreach (var b in ucs2Bytes)
+                hexBuilder.AppendFormat("{0:x2}", b);
+            return hexBuilder.ToString();
         }
 
         // Items returned in same order?
