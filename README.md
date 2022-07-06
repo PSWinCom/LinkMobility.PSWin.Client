@@ -6,23 +6,22 @@ Send SMS and receive mobile-originated messages and delivery reports using the L
 
 This is an implementation of the API described on the [PSWin Wiki](https://wiki.pswin.com/).
 
-A PSWin account from [LINK Mobility](https://www.linkmobility.com/) is required.
+A PSWin gateway account from [LINK Mobility](https://www.linkmobility.com/) is required.
 
-## Getting Started
+## Installation
 
 The project is avalable as two separate NuGet packages:
 - `LinkMobility.PSWin.Client` for sending SMS.
 - `LinkMobility.PSWin.Receiver` for receiving mobile-originated messages and delivery reports.
 
-The packages target .NET Standard 2.0 and can therefore be used in .NET Framework and .NET Core projects.
-See the [compatibility table](https://docs.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#tabpanel_1_net-standard-2-0) for more information.
-
-### Installation
-
+You can install both packages by typing the following commands in the NuGet console:
 ```
 PM> Install-Package LinkMobility.PSWin.Client
 PM> Install-Package LinkMobility.PSWin.Receiver
 ```
+
+The packages target .NET Standard 2.0 and can therefore be used in .NET Framework and .NET Core projects. See the [compatibility table](https://docs.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#tabpanel_1_net-standard-2-0) for more information.
+
 
 ## Quick Start
 
@@ -55,5 +54,4 @@ app.Run();
 
 ## License
 
-This project is licensed under the MIT No Attribution license.
-See [./LICENSE.txt](LICENSE.txt) for the license text.
+This project is licensed under the `MIT No Attribution` license. See [LICENSE.txt](./LICENSE.txt) for the license text.
