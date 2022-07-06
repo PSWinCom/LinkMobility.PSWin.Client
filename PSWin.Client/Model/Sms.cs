@@ -2,13 +2,9 @@ using System;
 
 namespace LinkMobility.PSWin.Client.Model
 {
-    /**
-     * <summary>
-     * Representation of an SMS message that can be sent to the LinkMobility Gateway XML API.
-     * </summary>
-     * <see cref=""/>
-     * <seealso cref="LinkMobility.GatewayClient.Message"/>
-     */
+    /// <summary>
+    /// An SMS message that is sent to the PSWin gateway.
+    /// </summary>
     public class Sms
     {
         public Sms(string senderNumber, string receiverNumber, string text)
@@ -36,17 +32,34 @@ namespace LinkMobility.PSWin.Client.Model
          * </list>
          * </value>
         */
+
+        /// <summary>
+        /// The message sender. Can be one of:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         Four- or five digit short code (digits only)
+        ///     </description></item>
+        ///     <item><description>
+        ///         A valid MSISDN. No spaces or international call prefix.
+        ///     </description></item>
+        ///     <item><description>
+        ///         A string up to 11 characters long, containing only spaces and the following characters: A-Z, a-z, 0-9 and <![CDATA[!”#%&’()*+-./><;]]>
+        ///     </description></item>
+        /// </list>
+        /// </summary>
         public string SenderNumber { get; set; }
 
         /// <summary>
-        /// The receiver of the message. Must be a valid msIsdn including countrycode without leading zeros or + sign.
+        /// The receiver of the message.
+        /// Must be a valid MSISDN. No spaces or international call prefix.
         /// </summary>
         public string ReceiverNumber { get; set; }
 
         /// <summary>
-        /// Contents of the message. For MMS this will be used as subject. Characters in this
-        /// text should exist in the Latin1 (ISO-8859-1) characterset, any other characters may
-        /// not be viewed properly on the receivers handset.
+        /// Contents of the message.
+        /// For messages of <see cref="Type"/> Text the characters should be in the GSM 03.38 basic character set,
+        /// or a national language shift table that the recipient's operator supports.
+        /// For messages of <see cref="Type"/> Unicode, the characters should be in the Unicode character set.
         /// </summary>
         public string Text { get; set; }
 
