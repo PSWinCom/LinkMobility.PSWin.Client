@@ -115,8 +115,6 @@ namespace LinkMobility.PSWin.Client.Transports
                 result.Add(new XElement("TTL", msg.TimeToLive.Value.TotalMinutes.ToString("0")));
             if (msg.DeliveryTime.HasValue)
                 result.Add(new XElement("DELIVERYTIME", msg.DeliveryTime.Value.ToString("yyyyMMddHHmm")));
-            if (msg.Network != null)
-                result.Add(new XElement("NET", msg.Network.ToString()));
             if (msg.Replace.HasValue)
                 result.Add(new XElement("REPLACE", msg.Replace.Value.ToString("D")));
             if (msg.IsFlashMessage)
