@@ -95,15 +95,13 @@ namespace LinkMobility.PSWin.Client.Transports
             result.Add(new XElement("SND", msg.SenderNumber));
             result.Add(new XElement("RCV", msg.ReceiverNumber));
 
-            if (msg.CpaGas != null)
+            if (msg.Payment != null)
             {
-                result.Add(new XElement("TARIFF", msg.CpaGas.Tariff));
-                if (!string.IsNullOrEmpty(msg.CpaGas.Tag))
-                    result.Add(new XElement("CPATAG", msg.CpaGas.Tag));
-                if (msg.CpaGas.AgeRestriction.HasValue)
-                    result.Add(new XElement("AGELIMIT", msg.CpaGas.AgeRestriction.Value.ToString("0")));
-                if (!string.IsNullOrEmpty(msg.CpaGas.ServiceCode))
-                    result.Add(new XElement("SERVICECODE", msg.CpaGas.ServiceCode));
+                result.Add(new XElement("TARIFF", msg.Payment.Tariff));
+                if (msg.Payment.AgeRestriction.HasValue)
+                    result.Add(new XElement("AGELIMIT", msg.Payment.AgeRestriction.Value.ToString("0")));
+                if (!string.IsNullOrEmpty(msg.Payment.ServiceCode))
+                    result.Add(new XElement("SERVICECODE", msg.Payment.ServiceCode));
             }
             
             if (msg.RequestReceipt)

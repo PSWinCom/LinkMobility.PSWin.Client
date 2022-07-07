@@ -57,10 +57,10 @@ namespace LinkMobility.PSWin.Client.Model
         public Replace? Replace { get; set; }
 
         /// <summary>
-        /// The PSWinCom Gateway supports billing of Goods and Services (CPA GAS) using mobile phones in Norway.
+        /// The PSWinCom Gateway supports billing using mobile phones in Norway.
         /// As opposed to traditional CPA/Premium SMS which can only be used to bill mobile content, CPA GAS can only be used to bill goods and services.
         /// </summary>
-        public CpaGas CpaGas { get; set; }
+        public Payment Payment { get; set; }
 
         /// <summary>
         /// Include the gateway reference of the message in the response.

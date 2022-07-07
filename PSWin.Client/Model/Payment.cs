@@ -1,18 +1,17 @@
 ﻿namespace LinkMobility.PSWin.Client.Model
 {
-    public class CpaGas
+    public class Payment
     {
-        public CpaGas(int tariff)
+        public Payment(int tariff)
         {
             Tariff = tariff;
         }
 
-        public CpaGas(int tariff, string serviceCode, int? ageLimit, string cpaTag)
+        public Payment(int tariff, string serviceCode, int? ageLimit)
         {
             Tariff = tariff;
             ServiceCode = serviceCode;
             AgeRestriction = ageLimit;
-            Tag = cpaTag;
         }
 
         /// <summary>
@@ -42,13 +41,5 @@
         /// It is recommended that you only use 16 or 18. 
         /// </summary>
         public int? AgeRestriction { get; set; }
-
-        /// <summary>
-        /// Premium SMS messages may have an additional description associated with them.
-        /// This value will be shown on the subscribers phone bill to help identify the service purchased.
-        /// Please note that not all operators support this property, and there may be restrictions the format.
-        /// Pelase consult PSWinCom technical support if you intend to use this feature. Others should set it to null.
-        /// </summary>
-        public string Tag { get; set; }
     }
 }
