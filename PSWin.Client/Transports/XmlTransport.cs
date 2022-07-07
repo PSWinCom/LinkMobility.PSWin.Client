@@ -104,9 +104,6 @@ namespace LinkMobility.PSWin.Client.Transports
                     result.Add(new XElement("SERVICECODE", msg.Payment.ServiceCode));
             }
             
-            if (msg.RequestReceipt)
-                result.Add(new XElement("RCPREQ", "Y"));
-            
             if (msg.Type.HasValue)
                 result.Add(new XElement("OP", msg.Type.Value.ToString("D")));
             if (msg.TimeToLive.HasValue)

@@ -63,12 +63,6 @@ namespace LinkMobility.PSWin.Client.Model
         public Payment Payment { get; set; }
 
         /// <summary>
-        /// Include the gateway reference of the message in the response.
-        /// The same reference is provided by the delivery report.
-        /// </summary>
-        public bool RequestReceipt { get; set; }
-
-        /// <summary>
         /// Specifies the number of minutes this message will be valid.
         /// The time is counted from the moment the message has been received and stored on PSWinCom Gateway.
         /// After the time has elapsed, the message will not be sent to the operator.
