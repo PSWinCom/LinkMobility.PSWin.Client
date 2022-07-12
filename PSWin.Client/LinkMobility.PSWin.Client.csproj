@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Link Mobility NE</Authors>
     <Company></Company>
     <Description>Send SMS through PSWin gateway.</Description>
@@ -16,6 +16,7 @@
     <PackageTags>PSWin;SMS</PackageTags>
     <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
     <PackageId>LinkMobilityNE.PSWin.Client</PackageId>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
