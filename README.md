@@ -16,8 +16,8 @@ The project is avalable as two separate NuGet packages:
 
 You can install both packages by typing the following commands in the NuGet console:
 ```
-PM> Install-Package LinkMobility.PSWin.Client
-PM> Install-Package LinkMobility.PSWin.Receiver
+PM> Install-Package LinkMobilityNE.PSWin.Client
+PM> Install-Package LinkMobilityNE.PSWin.Receiver
 ```
 
 The packages target .NET Standard 2.0 and can therefore be used in .NET Framework and .NET Core projects. See the [compatibility table](https://docs.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#tabpanel_1_net-standard-2-0) for more information.
