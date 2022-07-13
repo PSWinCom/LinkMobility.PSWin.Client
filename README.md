@@ -11,8 +11,8 @@ A PSWin gateway account from [LINK Mobility](https://www.linkmobility.com/) is r
 ## Installation
 
 The project is avalable as two separate NuGet packages:
-- `LinkMobility.PSWin.Client` for sending SMS.
-- `LinkMobility.PSWin.Receiver` for receiving mobile-originated messages and delivery reports.
+- `LinkMobilityNE.PSWin.Client` for sending SMS.
+- `LinkMobilityNE.PSWin.Receiver` for receiving mobile-originated messages and delivery reports.
 
 You can install both packages by typing the following commands in the NuGet console:
 ```
