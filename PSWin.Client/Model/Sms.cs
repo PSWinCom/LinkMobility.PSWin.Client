@@ -43,6 +43,7 @@ namespace LinkMobility.PSWin.Client.Model
         /// Thus, the maximum length is 16*134=2144 characters. This is done automatically by the SMS Gateway.
         /// Text messages of more than 2144 characters will be truncated.
         /// Please note that only characters defined in the GSM-7 basic character set is allowed for messages of <see cref="Type"/> Text.
+        /// </summary>
         public string Text { get; set; }
 
         /// <summary>
