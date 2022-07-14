@@ -52,9 +52,7 @@ namespace LinkMobility.PSWin.Client.Transports
         /// <inheritdoc/>
         public async Task<IEnumerable<MessageResult>> SendAsync(IEnumerable<Sms> messages, string sessionData = null)
         {
-            var messageBatches = messages
-                .Batch(BatchSize)
-                .Select(b => b.ToArray());
+            var messageBatches = messages.Batch(BatchSize);
             var results = new List<MessageResult>();
             foreach (var messageBatch in messageBatches)
             {

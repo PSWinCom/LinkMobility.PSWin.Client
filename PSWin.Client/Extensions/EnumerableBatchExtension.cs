@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LinkMobility.PSWin.Client.Extensions
 {
     internal static class EnumerableBatchExtension
     {
-        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> self, uint batchSize)
+        public static IEnumerable<T[]> Batch<T>(this IEnumerable<T> self, uint batchSize)
         {
             if (batchSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(batchSize), batchSize, "Batch size must be greater than zero.");
@@ -25,7 +26,7 @@ namespace LinkMobility.PSWin.Client.Extensions
 
             while (enumerator.MoveNext())
             {
-                yield return GetBatch();
+                yield return GetBatch().ToArray();
             }
         }
     }

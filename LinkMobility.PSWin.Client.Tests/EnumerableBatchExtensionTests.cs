@@ -29,13 +29,9 @@ namespace LinkMobility.PSWin.Client.Tests
         {
             var checker = new MultipleEnumerationChecker();
             var items = checker.GetItems(30);
-            
-            var iteratedItems = 0;
-            foreach (var batch in items.Batch(10))
-                foreach (var item in batch)
-                    iteratedItems++;
 
-            Assume.That(iteratedItems, Is.GreaterThan(0));
+            items.Batch(10).Count();
+
             Assert.That(checker.Enumerations, Is.EqualTo(1), "Enumerations");
         }
 
@@ -54,11 +50,9 @@ namespace LinkMobility.PSWin.Client.Tests
         public void Test_one_batch(int itemCount)
         {
             var items = Enumerable.Range(0, itemCount).ToArray();
-            var batches = items.Batch(10);
-            var enumerator = batches.GetEnumerator();
-            Assert.That(enumerator.MoveNext(), Is.True, "At least one batch");
-            Assert.That(enumerator.Current, Is.EqualTo(Enumerable.Range(0, itemCount)), "Batch content");
-            Assert.That(enumerator.MoveNext(), Is.False, "No second batch");
+            var batches = items.Batch(10).ToArray();
+            Assert.That(batches.Length, Is.EqualTo(1), "Number of batches");
+            Assert.That(batches[0], Is.EqualTo(Enumerable.Range(0, itemCount)), "Batch content");
         }
 
         [Test]
@@ -68,13 +62,10 @@ namespace LinkMobility.PSWin.Client.Tests
         public void Test_two_batches(int itemCount)
         {
             var items = Enumerable.Range(0, itemCount).ToArray();
-            var batches = items.Batch(10);
-            var enumerator = batches.GetEnumerator();
-            Assert.That(enumerator.MoveNext(), Is.True, "At least one batch");
-            Assert.That(enumerator.Current, Is.EqualTo(Enumerable.Range(0, 10)), "First batch content");
-            Assert.That(enumerator.MoveNext(), Is.True, "At least two batches");
-            Assert.That(enumerator.Current, Is.EqualTo(Enumerable.Range(10, itemCount - 10)), "Second batch content");
-            Assert.That(enumerator.MoveNext(), Is.False, "No third batch");
+            var batches = items.Batch(10).ToArray();
+            Assert.That(batches.Length, Is.EqualTo(2), "Number of batches");
+            Assert.That(batches[0], Is.EqualTo(Enumerable.Range(0, 10)), "First batch content");
+            Assert.That(batches[1], Is.EqualTo(Enumerable.Range(10, itemCount - 10)), "Second batch content");
         }
 
         public class MultipleEnumerationChecker
