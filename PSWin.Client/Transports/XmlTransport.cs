@@ -11,16 +11,27 @@ using System.Xml.Linq;
 
 namespace LinkMobility.PSWin.Client.Transports
 {
-    internal class XmlTransport : ITransport
+    /// <summary>
+    /// Implementation of the PSWin XML API.
+    /// </summary>
+    public class XmlTransport : ITransport
     {
-        public static readonly Uri DefaultEndpoint = new Uri("https://xml.pswin.com");
-        public const uint BatchSize = 100;
+        private static readonly Uri DefaultEndpoint = new Uri("https://xml.pswin.com");
+        private const uint BatchSize = 100;
 
         private readonly Uri endpoint;
         private string username;
         private string password;
         private Lazy<HttpClient> client = new Lazy<HttpClient>(() => new HttpClient());
 
+        /// <summary>
+        /// Initialize the transport with an alternate endpoint.
+        /// This is useful if for example Link Mobility has assigned you an account on the test system.
+        /// Note that it must be an XML endpoint, not the SOAP or Simple HTTP endpoints that PSWin also provides.
+        /// </summary>
+        /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="endpoint">The alternate XML endpoint to use.</param>
         public XmlTransport(string username, string password, Uri endpoint)
         {
             this.username = username;
@@ -28,10 +39,17 @@ namespace LinkMobility.PSWin.Client.Transports
             this.endpoint = endpoint;
         }
 
+        /// <summary>
+        /// Initialize the transport with the default endpoint.
+        /// The default endpoint is connected to the production system that sends real text messages and bills your account accordingly.
+        /// </summary>
+        /// <param name="username">The username assigned to you by Link Mobility.</param>
+        /// <param name="password">The password assigned to you by Link Mobility.</param>
         public XmlTransport(string username, string password) : this(username, password, DefaultEndpoint)
         {
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<MessageResult>> SendAsync(IEnumerable<Sms> messages, string sessionData = null)
         {
             var messageBatches = messages
@@ -83,14 +101,14 @@ namespace LinkMobility.PSWin.Client.Transports
             return new XElement("MSGLST", messages.Select(BuildMessage));
         }
 
-        private XElement BuildMessage(Sms msg, int batchIndex)
+        private XElement BuildMessage(Sms msg, int index)
         {
             var text = msg.Text;
             if (msg.Type == MessageType.Unicode)
                 text = Ucs2HexEncode(text);
 
             var result = new XElement("MSG");
-            result.Add(new XElement("ID", batchIndex + 1));
+            result.Add(new XElement("ID", index + 1));
             result.Add(new XElement("TEXT", text));
             result.Add(new XElement("SND", msg.SenderNumber));
             result.Add(new XElement("RCV", msg.ReceiverNumber));
@@ -128,26 +146,24 @@ namespace LinkMobility.PSWin.Client.Transports
             return hexBuilder.ToString();
         }
 
-        // Items returned in same order?
-        // MSGLST populated if batch fails?
         private static IEnumerable<MessageResult> GetSendResult(XDocument response, Sms[] messages)
         {
             var logon = response.Descendants("LOGON").FirstOrDefault()?.Value;
             var reason = response.Descendants("REASON").FirstOrDefault()?.Value;
             if (logon == "OK")
             {
-                return response
-                    .Descendants("MSG")
-                    .Select((el) =>
-                    {
-                        var id = int.Parse(el.Element("ID").Value);
-                        return new MessageResult(
-                            el.Element("REF")?.Value,
-                            el.Element("STATUS")?.Value == "OK",
-                            el.Element("INFO")?.Value,
-                            messages[id - 1]
-                        );
-                    });
+                var results = new MessageResult[messages.Length];
+                foreach (var el in response.Descendants("MSG"))
+                {
+                    var index = int.Parse(el.Element("ID").Value) - 1;
+                    results[index] = new MessageResult(
+                        el.Element("REF")?.Value,
+                        el.Element("STATUS")?.Value == "OK",
+                        el.Element("INFO")?.Value,
+                        messages[index]
+                    );
+                }
+                return results;
             }
             else
             {
