@@ -20,9 +20,9 @@ namespace LinkMobility.PSWin.Client.Transports
         private const uint BatchSize = 100;
 
         private readonly Uri endpoint;
+        private readonly HttpClient client;
         private string username;
         private string password;
-        private Lazy<HttpClient> client;
 
         /// <summary>
         /// Initialize the transport with an alternate endpoint.
@@ -32,13 +32,13 @@ namespace LinkMobility.PSWin.Client.Transports
         /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="endpoint">The alternate XML endpoint to use.</param>
-        /// <param name="messageHandler">Messagehandler used when sending xml</param>
-        public XmlTransport(string username, string password, Uri endpoint, HttpMessageHandler messageHandler)
+        /// <param name="client">HttpClient used when sending xml</param>
+        public XmlTransport(string username, string password, Uri endpoint, HttpClient client)
         {
             this.username = username;
             this.password = password;
             this.endpoint = endpoint;
-            this.client = new Lazy<HttpClient>(() => new HttpClient(messageHandler));
+            this.client = client;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace LinkMobility.PSWin.Client.Transports
         /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="endpoint">The alternate XML endpoint to use.</param>
-        public XmlTransport(string username, string password, Uri endpoint) : this(username, password, endpoint, new HttpClientHandler())
+        public XmlTransport(string username, string password, Uri endpoint) : this(username, password, endpoint, new HttpClient())
         {
         }
 
