@@ -22,7 +22,7 @@ namespace LinkMobility.PSWin.Client.Transports
         private readonly Uri endpoint;
         private string username;
         private string password;
-        private Lazy<HttpClient> client = new Lazy<HttpClient>(() => new HttpClient());
+        private Lazy<HttpClient> client;
 
         /// <summary>
         /// Initialize the transport with an alternate endpoint.
@@ -32,11 +32,25 @@ namespace LinkMobility.PSWin.Client.Transports
         /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="endpoint">The alternate XML endpoint to use.</param>
-        public XmlTransport(string username, string password, Uri endpoint)
+        /// <param name="messageHandler">Messagehandler used when sending xml</param>
+        public XmlTransport(string username, string password, Uri endpoint, HttpMessageHandler messageHandler)
         {
             this.username = username;
             this.password = password;
             this.endpoint = endpoint;
+            this.client = new Lazy<HttpClient>(() => new HttpClient(messageHandler));
+        }
+
+        /// <summary>
+        /// Initialize the transport with an alternate endpoint.
+        /// This is useful if for example Link Mobility has assigned you an account on the test system.
+        /// Note that it must be an XML endpoint, not the SOAP or Simple HTTP endpoints that PSWin also provides.
+        /// </summary>
+        /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="endpoint">The alternate XML endpoint to use.</param>
+        public XmlTransport(string username, string password, Uri endpoint) : this(username, password, endpoint, new HttpClientHandler())
+        {
         }
 
         /// <summary>
