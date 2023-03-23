@@ -86,7 +86,7 @@ namespace LinkMobility.PSWin.Client.Transports
                 Content = new StringContent(payload.Declaration.ToString() + payload.ToString(), Encoding.UTF8, "text/xml"),
             };
 
-            var response = await client.Value.SendAsync(request);
+            var response = await client.SendAsync(request);
             if (!response.IsSuccessStatusCode)
                 throw new SendMessageException($"Sending failed because Gateway endpoint returned {(int)response.StatusCode} {response.ReasonPhrase}");
 
