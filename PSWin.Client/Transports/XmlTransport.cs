@@ -20,9 +20,9 @@ namespace LinkMobility.PSWin.Client.Transports
         private const uint BatchSize = 100;
 
         private readonly Uri endpoint;
+        private readonly HttpClient client;
         private string username;
         private string password;
-        private Lazy<HttpClient> client = new Lazy<HttpClient>(() => new HttpClient());
 
         /// <summary>
         /// Initialize the transport with an alternate endpoint.
@@ -32,11 +32,25 @@ namespace LinkMobility.PSWin.Client.Transports
         /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
         /// <param name="endpoint">The alternate XML endpoint to use.</param>
-        public XmlTransport(string username, string password, Uri endpoint)
+        /// <param name="client">HttpClient used when sending xml</param>
+        public XmlTransport(string username, string password, Uri endpoint, HttpClient client)
         {
             this.username = username;
             this.password = password;
             this.endpoint = endpoint;
+            this.client = client;
+        }
+
+        /// <summary>
+        /// Initialize the transport with an alternate endpoint.
+        /// This is useful if for example Link Mobility has assigned you an account on the test system.
+        /// Note that it must be an XML endpoint, not the SOAP or Simple HTTP endpoints that PSWin also provides.
+        /// </summary>
+        /// <param name="username">The username assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="password">The password assigned to the account on the given <paramref name="endpoint"/>.</param>
+        /// <param name="endpoint">The alternate XML endpoint to use.</param>
+        public XmlTransport(string username, string password, Uri endpoint) : this(username, password, endpoint, new HttpClient())
+        {
         }
 
         /// <summary>
@@ -72,7 +86,7 @@ namespace LinkMobility.PSWin.Client.Transports
                 Content = new StringContent(payload.Declaration.ToString() + payload.ToString(), Encoding.UTF8, "text/xml"),
             };
 
-            var response = await client.Value.SendAsync(request);
+            var response = await client.SendAsync(request);
             if (!response.IsSuccessStatusCode)
                 throw new SendMessageException($"Sending failed because Gateway endpoint returned {(int)response.StatusCode} {response.ReasonPhrase}");
 
