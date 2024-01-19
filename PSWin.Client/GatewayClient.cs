@@ -1,6 +1,7 @@
 ﻿using LinkMobility.PSWin.Client.Interfaces;
 using LinkMobility.PSWin.Client.Model;
 using LinkMobility.PSWin.Client.Transports;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,16 @@ namespace LinkMobility.PSWin.Client
         public GatewayClient(string username, string password) : this(new XmlTransport(username, password))
         {
         }
+
+         /// <summary>
+         /// Initializes a client that sends messages using the default transport.
+         /// </summary>
+         /// <param name="username">The username assigned to you by Link Mobility.</param>
+         /// <param name="password">The password assigned to you by Link Mobility.</param>
+         /// <param name="endpoint">The alternate XML endpoint to use.</param>
+         public GatewayClient(string username, string password, Uri endpoint) : this(new XmlTransport(username, password, endpoint))
+         {
+         }
 
         /// <summary>
         /// Initialize a client using the given transport.
