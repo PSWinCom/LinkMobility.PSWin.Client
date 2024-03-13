@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -17,6 +16,7 @@ namespace LinkMobility.GatewayReceiver
         public delegate Task MoReceiver(MoMessage message);
         public delegate Task DrReceiver(DrMessage message);
 
+        private const string XmlOkResponse = "<?xml version=\"1.0\"?><MSGLST><MSG><ID>1</ID><STATUS>OK</STATUS></MSG></MSGLST>";
         private readonly MoReceiver moReceiver;
         private readonly DrReceiver drReceiver;
 
@@ -31,7 +31,7 @@ namespace LinkMobility.GatewayReceiver
             var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
             var result = await ReceiveMobileOriginatedMessageAsync(body);
             context.Response.StatusCode = (int)result.status;
-            await new StreamWriter(context.Response.Body).WriteAsync(result.responseBody);
+            await HttpResponseWritingExtensions.WriteAsync(context.Response, result.responseBody);
         }
 
         public async Task<(HttpStatusCode status, string responseBody)> ReceiveMobileOriginatedMessageAsync(string requestBody)
@@ -46,7 +46,7 @@ namespace LinkMobility.GatewayReceiver
             {
                 var momessage = MoParser.Parse(document);
                 await moReceiver.Invoke(momessage);
-                return (HttpStatusCode.OK, string.Empty);
+                return (HttpStatusCode.OK, XmlOkResponse);
             }
             catch (MoParserException ex)
             {
@@ -63,7 +63,7 @@ namespace LinkMobility.GatewayReceiver
             var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
             var result = await ReceiveDeliveryReportAsync(body);
             context.Response.StatusCode = (int)result.status;
-            await new StreamWriter(context.Response.Body).WriteAsync(result.responseBody);
+            await HttpResponseWritingExtensions.WriteAsync(context.Response, result.responseBody);
         }
 
         public async Task<(HttpStatusCode status, string responseBody)> ReceiveDeliveryReportAsync(string requestBody)
@@ -78,7 +78,7 @@ namespace LinkMobility.GatewayReceiver
             {
                 var drmessage = DrParser.Parse(document);
                 await drReceiver.Invoke(drmessage);
-                return (HttpStatusCode.OK, string.Empty);
+                return (HttpStatusCode.OK, XmlOkResponse);
             }
             catch (DrParserException ex)
             {
