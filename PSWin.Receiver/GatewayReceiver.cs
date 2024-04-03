@@ -4,7 +4,10 @@ using LinkMobility.PSWin.Receiver.Parsers;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -19,6 +22,7 @@ namespace LinkMobility.GatewayReceiver
         private const string XmlOkResponse = "<?xml version=\"1.0\"?><MSGLST><MSG><ID>1</ID><STATUS>OK</STATUS></MSG></MSGLST>";
         private readonly MoReceiver moReceiver;
         private readonly DrReceiver drReceiver;
+        private static readonly Encoding defaultEncoding = Encoding.GetEncoding("ISO-8859-1");
 
         public GatewayReceiver(MoReceiver moReceiver, DrReceiver drReceiver)
         {
@@ -28,7 +32,7 @@ namespace LinkMobility.GatewayReceiver
 
         public async Task ReceiveMobileOriginatedMessageAsync(HttpContext context)
         {
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            var body = await ReadBodyAsync(context.Request);
             var result = await ReceiveMobileOriginatedMessageAsync(body);
             context.Response.StatusCode = (int)result.status;
             await HttpResponseWritingExtensions.WriteAsync(context.Response, result.responseBody);
@@ -60,7 +64,7 @@ namespace LinkMobility.GatewayReceiver
 
         public async Task ReceiveDeliveryReportAsync(HttpContext context)
         {
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            var body = await ReadBodyAsync(context.Request);
             var result = await ReceiveDeliveryReportAsync(body);
             context.Response.StatusCode = (int)result.status;
             await HttpResponseWritingExtensions.WriteAsync(context.Response, result.responseBody);
@@ -88,6 +92,38 @@ namespace LinkMobility.GatewayReceiver
             {
                 return (HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        private static async Task<string> ReadBodyAsync(HttpRequest request)
+        {
+            Encoding encoding = GetEncoding(request, defaultEncoding);
+            using (var reader = new StreamReader(request.Body, encoding))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        private static Encoding GetEncoding(HttpRequest request, Encoding defaultEncoding)
+        {
+            try
+            {
+                if (request.Headers.TryGetValue("Content-Type", out var values))
+                {
+                    if (values.Count > 0)
+                    {
+                        var contentType = values.First();
+                        var charset = new ContentType(contentType).CharSet;
+                        if (charset != null)
+                            return Encoding.GetEncoding(charset);
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is NotSupportedException || ex is FormatException)
+            {
+                // Content-Type header malformed or encoding not supported.
+                // Try default encoding instead.
+            }
+            return defaultEncoding;
         }
 
         private async Task<(XDocument document, HttpStatusCode code, string message)> GetDocumentFromBody(string content)
