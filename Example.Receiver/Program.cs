@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 var receiver = new GatewayReceiver(
+    app.Logger,
     async (mo) => await PrintMo(mo),
     async (dr) => await PrintDr(dr));
 
