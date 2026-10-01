@@ -47,6 +47,11 @@ namespace LinkMobility.GatewayReceiver
             log.LogInformation(nameof(GatewayReceiver) + " logging initialized");
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GatewayReceiver"/> class with the specified MO receiver and DR receiver.
+        /// </summary>
+        /// <param name="moReceiver">The delegate that will be invoked when a mobile originated message is received.</param>
+        /// <param name="drReceiver">The delegate that will be invoked when a delivery report is received.</param>
         public GatewayReceiver(MoReceiver moReceiver, DrReceiver drReceiver)
         {
             this.moReceiver = moReceiver;
