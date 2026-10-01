@@ -78,7 +78,7 @@ namespace LinkMobility.GatewayReceiver
             try
             {
                 var momessage = MoParser.Parse(document);
-                using (log.BeginScope(new { SenderNumber = momessage.Sender, ReceiverNumber = momessage.Receiver }))
+                using (log.BeginScope(new { ReceiverNumber = momessage.Receiver }))
                 {
                     log.LogDebug("MO message parsed");
                     await moReceiver.Invoke(momessage);
@@ -123,7 +123,7 @@ namespace LinkMobility.GatewayReceiver
             try
             {
                 var drmessage = DrParser.Parse(document);
-                using (log.BeginScope(new { ReceiverNumber = drmessage.Receiver, Reference = drmessage.Reference }))
+                using (log.BeginScope(new { Reference = drmessage.Reference }))
                 {
                     log.LogDebug("DR message parsed");
                     await drReceiver.Invoke(drmessage);
