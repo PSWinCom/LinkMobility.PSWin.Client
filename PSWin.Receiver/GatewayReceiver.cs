@@ -78,13 +78,9 @@ namespace LinkMobility.GatewayReceiver
             try
             {
                 var momessage = MoParser.Parse(document);
-                using (log.BeginScope(new { ReceiverNumber = momessage.Receiver }))
-                {
-                    log.LogDebug("MO message parsed");
-                    await moReceiver.Invoke(momessage);
-                    log.LogDebug("MO endpoint returning {StatusCode}: Message processed", (int)HttpStatusCode.OK);
-                    return (HttpStatusCode.OK, XmlOkResponse);
-                }
+                await moReceiver.Invoke(momessage);
+                log.LogDebug("MO endpoint returning {StatusCode}: Message processed", (int)HttpStatusCode.OK);
+                return (HttpStatusCode.OK, XmlOkResponse);
             }
             catch (MoParserException ex)
             {
@@ -123,13 +119,9 @@ namespace LinkMobility.GatewayReceiver
             try
             {
                 var drmessage = DrParser.Parse(document);
-                using (log.BeginScope(new { Reference = drmessage.Reference }))
-                {
-                    log.LogDebug("DR message parsed");
-                    await drReceiver.Invoke(drmessage);
-                    log.LogDebug("DR endpoint returning {StatusCode}: Report processed", (int)HttpStatusCode.OK);
-                    return (HttpStatusCode.OK, XmlOkResponse);
-                }
+                await drReceiver.Invoke(drmessage);
+                log.LogDebug("DR endpoint returning {StatusCode}: Report processed", (int)HttpStatusCode.OK);
+                return (HttpStatusCode.OK, XmlOkResponse);
             }
             catch (DrParserException ex)
             {
